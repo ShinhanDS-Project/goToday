@@ -1,4 +1,4 @@
-1<%@ page language="java" contentType="text/html; charset=UTF-8"
+<%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -6,11 +6,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>티켓 결제</title>
-    <!-- 토스페이먼츠 SDK -->
-    <script src="https://js.tosspayments.com/v2/standard"></script>
+    <script src="https://js.tosspayments.com/v1/payment"></script>
 </head>
 <body>
-    <!-- ===================== HEADER ===================== -->
     <header>
         <a href="#" aria-label="GoToday 홈">GoToday</a>
 
@@ -30,21 +28,16 @@
 
     <hr />
 
-    <!-- ===================== MAIN ===================== -->
     <main>
-        <!-- 상단 타이틀(콘텐츠명/기간) -->
         <section aria-label="콘텐츠 타이틀">
             <h1>${contentVo.title} 2026-01-01(목) ~ 2026-02-28(토)</h1>
         </section>
 
-        <!-- 결제 폼 -->
         <form id="paymentForm" action="#" method="post">
-            <!-- 서버 연동용 hidden -->
             <input type="hidden" name="contentId" value="${reservation.content_id}" />
             <input type="hidden" name="orderId" value="${paymentDTO.orderId}" />
             <input type="hidden" name="totalPrice" value="${reservation.total_price}" />
 
-            <!-- ===================== 티켓 결제 / 주문 상세 ===================== -->
             <section aria-label="티켓 결제">
                 <h2>티켓 결제</h2>
 
@@ -84,7 +77,6 @@
 
             <hr />
 
-            <!-- ===================== 수령인 정보 ===================== -->
             <section aria-label="수령인 정보">
                 <h2>수령인 정보</h2>
 
@@ -121,7 +113,6 @@
 
             <hr />
 
-            <!-- ===================== 티켓 수령 방법 ===================== -->
             <section aria-label="티켓 수령 방법">
                 <h2>티켓 수령 방법</h2>
 
@@ -142,20 +133,6 @@
 
             <hr />
 
-            <!-- ===================== 결제 수단 (토스페이먼츠 위젯) ===================== -->
-            <section aria-label="결제 수단">
-                <h2>결제 수단</h2>
-
-                <!-- 토스페이먼츠 결제 위젯 영역 -->
-                <div id="payment-method"></div>
-
-                <!-- 토스페이먼츠 약관 동의 영역 -->
-                <div id="agreement"></div>
-            </section>
-
-            <hr />
-
-            <!-- ===================== 약관 동의 ===================== -->
             <section aria-label="약관 동의">
                 <h2>약관 동의</h2>
 
@@ -187,7 +164,6 @@
 
             <hr />
 
-            <!-- ===================== 결제 정보(우측 카드 영역) ===================== -->
             <section aria-label="결제 정보">
                 <h2>결제 정보</h2>
 
@@ -210,90 +186,63 @@
         </form>
     </main>
 
-    <!-- ===================== 토스페이먼츠 결제 스크립트 ===================== -->
     <script>
-        main();
+        const button = document.getElementById("payment-button");
+        
+        // [수정완료] 내 API 개별 연동 클라이언트 키 (test_ck_Z...)
+        const clientKey = "test_ck_Z1aOwX7K8mv4q4Qap4q03yQxzvNP"; 
+        const tossPayments = TossPayments(clientKey);
 
-        async function main() {
-            const button = document.getElementById("payment-button");
+        button.addEventListener("click", async function () {
+            // 수령인 정보 가져오기
+            const receiverName = document.querySelector('input[name="receiver_name"]').value;
+            const receiverBirth = document.querySelector('input[name="receiver_birth"]').value;
+            const receiverPhone = document.querySelector('input[name="receiver_phone"]').value;
+            const receiverEmail = document.querySelector('input[name="receiver_email"]').value;
+            const receiveType = document.querySelector('input[name="receive_type"]:checked').value;
 
-            // 결제위젯 초기화
-            const clientKey = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
-            const tossPayments = TossPayments(clientKey);
+            // 1. 먼저 서버에 예약 정보 저장 요청
+            try {
+                const response = await fetch("${pageContext.request.contextPath}/reserve/payment.do", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded",
+                    },
+                    body: new URLSearchParams({
+                        receiver_name: receiverName,
+                        receiver_birth: receiverBirth,
+                        receiver_phone: receiverPhone,
+                        receive_type: receiveType
+                    })
+                });
 
-            const customerKey = "xcvul8W8I_rktuXVZPPHS";
-            const widgets = tossPayments.widgets({
-                customerKey,
-            });
+                const result = await response.json();
 
-            // 결제 금액 설정
-            const amount = parseInt("${paymentDTO.amount}") || 0;
+                // 2. 서버 응답이 성공이면 토스 결제창 호출 (일반 결제창 방식)
+                if (result.success) {
+                    console.log("예약 정보 저장 성공, 토스 결제창 호출");
 
-            await widgets.setAmount({
-                currency: "KRW",
-                value: amount,
-            });
-
-            // 결제 위젯 렌더링
-            await Promise.all([
-                widgets.renderPaymentMethods({
-                    selector: "#payment-method",
-                    variantKey: "DEFAULT",
-                }),
-                widgets.renderAgreement({
-                    selector: "#agreement",
-                    variantKey: "AGREEMENT"
-                }),
-            ]);
-
-            // '결제하기' 버튼 클릭
-            button.addEventListener("click", async function () {
-                // 수령인 정보 가져오기
-                const receiverName = document.querySelector('input[name="receiver_name"]').value;
-                const receiverBirth = document.querySelector('input[name="receiver_birth"]').value;
-                const receiverPhone = document.querySelector('input[name="receiver_phone"]').value;
-                const receiverEmail = document.querySelector('input[name="receiver_email"]').value;
-                const receiveType = document.querySelector('input[name="receive_type"]:checked').value;
-
-                // 1. 먼저 서버에 예약 정보 저장 요청 (POST /reserve/payment.do)
-                try {
-                    const response = await fetch("${pageContext.request.contextPath}/reserve/payment.do", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/x-www-form-urlencoded",
-                        },
-                        body: new URLSearchParams({
-                            receiver_name: receiverName,
-                            receiver_birth: receiverBirth,
-                            receiver_phone: receiverPhone,
-                            receive_type: receiveType
-                        })
+                    // [수정완료] 위젯 대신 requestPayment 사용
+                    tossPayments.requestPayment('카드', { 
+                        amount: result.amount,
+                        orderId: result.orderId,
+                        orderName: result.orderName,
+                        customerName: result.customerName || receiverName,
+                        customerEmail: receiverEmail,
+                        
+                        // 성공/실패 시 이동할 URL (Context Path 포함)
+                        successUrl: window.location.origin + "${pageContext.request.contextPath}/reserve_pay/success.do",
+                        failUrl: window.location.origin + "${pageContext.request.contextPath}/payments/fail.do",
                     });
 
-                    const result = await response.json();
-
-                    // 2. 서버 응답이 성공이면 토스페이먼츠 결제 요청
-                    if (result.success) {
-                        console.log("예약 정보 저장 성공, 토스 결제 요청 시작");
-
-                        await widgets.requestPayment({
-                            orderId: result.orderId,
-                            orderName: result.orderName,
-                            customerName: result.customerName || receiverName,
-                            customerEmail: receiverEmail,
-
-                            successUrl: window.location.origin + "${pageContext.request.contextPath}/reserve_pay/success.do",
-                            failUrl: window.location.origin + "${pageContext.request.contextPath}/payments/fail.do",
-                        });
-                    } else {
-                        alert("예약 처리 실패: " + result.msg);
-                    }
-                } catch (error) {
-                    console.error("예약 요청 오류:", error);
-                    alert("예약 처리 중 오류가 발생했습니다.");
+                } else {
+                    alert("예약 처리 실패: " + result.msg);
                 }
-            });
-        }
+            } catch (error) {
+                console.error("예약 요청 오류:", error);
+                alert("예약 처리 중 오류가 발생했습니다.");
+            }
+        });
     </script>
 </body>
 </html>
