@@ -10,7 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import kr.co.gotoday.content.ContentScheduleVO;
 import kr.co.gotoday.payment.PaymentVO;
+import kr.co.gotoday.reservation.ReservationVO;
 
 @Service
 public class CancelService {
@@ -20,6 +22,7 @@ public class CancelService {
 
     // 토스페이먼츠 시크릿 키 (개발자센터에서 확인, "test_sk_..." 형태)
     private final String TOSS_SECRET_KEY = "test_sk_DpexMgkW36ym117LE2x48GbR5ozO"; 
+    
 
     @Transactional
     public void cancelPayment(String orderId, String cancelReason) throws Exception {
@@ -29,6 +32,21 @@ public class CancelService {
         if (payment == null) {
             throw new Exception("결제 정보를 찾을 수 없습니다.");
         }
+        
+        
+        int targetReservationId = payment.getReservation_id();
+        ReservationVO reservation = cancelMapper.findReservationByReservationId(targetReservationId);
+        
+        int cnt = reservation.getAdult_qty() + reservation.getChild_qty()+ reservation.getTeen_qty();
+        
+        int targetContentId = reservation.getContent_id();
+        ContentScheduleVO contentSchedule = cancelMapper.findContent_scheduleByContentId(targetContentId);
+        
+        
+        
+        
+        
+        
         
         String paymentKey = payment.getPayment_key();
 

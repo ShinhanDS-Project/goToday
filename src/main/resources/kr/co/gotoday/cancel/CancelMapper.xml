@@ -5,6 +5,17 @@
 		resultType="kr.co.gotoday.payment.PaymentVO">
 		SELECT * FROM payment WHERE order_key = #{orderId}
 	</select>
+	
+	<select id="findReservationByReservationId"
+		resultType="kr.co.gotoday.user.ResetvationVO">
+		SELECT * FROM reservation WHERE reservation_id = #{reservation_id}	
+	</select>
+	
+	<select id="findContent_scheduleByContentId"
+		resultType="kr.co.gotoday.content.ContentScheduleVO">
+		SELECT * FROM content_schedule WHERE content_id = #{content_id}
+	</select>
+	
 
 	<update id="updatePaymentStatusToCancel">
 		UPDATE payment
@@ -16,6 +27,11 @@
 	<update id="updateReservationStatusToCancel">
 		UPDATE reservation
 		SET reservation_status = 'CANCELED'
-		WHERE reservation_id = #{reservationId}
+		WHERE reservation_id = #{reservationId}	
 	</update>
+	
+	<update id=""
+	
+	
+	
 </mapper>
