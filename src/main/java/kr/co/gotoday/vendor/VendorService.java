@@ -1,15 +1,5 @@
 package kr.co.gotoday.vendor;
 
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
-import org.springframework.web.multipart.MultipartFile;
-
-import kr.co.gotoday.content.ContentScheduleVO;
-import kr.co.gotoday.content.ContentVO;
-
 public interface VendorService {
 	//content 추가
 	int createContent(ContentVO contentVo, ContentScheduleVO contentScheduleVO, 

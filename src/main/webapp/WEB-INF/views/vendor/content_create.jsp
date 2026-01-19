@@ -5,12 +5,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>
-  	<c:choose>
-  		<c:when test="${isEdit}">전시 수정</c:when>
-  		<c:otherwise>새 전시 등록</c:otherwise>
-  	</c:choose>
-  </title>
+  <title><c:choose><c:when test="${isEdit}">전시 수정</c:when><c:otherwise>새 전시 등록</c:otherwise></c:choose></title>
   <style>
     * {
       margin: 0;
@@ -180,34 +175,6 @@
       border-radius: 8px;
       font-size: 14px;
     }
-    
-    /* 시간대별 티켓 수 */
-    #ticket-total {
-	    width: 120px;     
-	    text-align: center;
-	}
-    
-    /* 스케줄 입력 */
-    #scheduleList {
-	    display: flex;
-	    flex-direction: column; 
-	    gap: 10px;
-	}
-    .schedule-item {
-	    display: flex;
-	    gap: 4px;
-	    align-items: center;
-	    margin-bottom: 8px;
-	}
-	
-	.remove-btn {
-	    background: #eee;
-	    border: 1px solid #ccc;
-	    cursor: pointer;
-	    width: 40px;
-	    height: 35px;
-	    border-radius: 8px;
-	}
 
     /* 링크 입력 */
     .link-inputs {
@@ -386,41 +353,25 @@
       margin-top: 4px;
     }
   </style>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-<script src="/gotoday/smarteditor/js/HuskyEZCreator.js"></script>
-<script>
-//네이버 스마트 에디터
-var oEditors = [];
-$(function() {
-    nhn.husky.EZCreator.createInIFrame({
-        oAppRef: oEditors,
-        elPlaceHolder: "detail_description",
-        sSkinURI: "/gotoday/smarteditor/SmartEditor2Skin.html",    
-        htParams : {
-            bUseToolbar : true,                // 툴바 사용 여부 (true:사용/ false:사용하지 않음)
-            bUseVerticalResizer : true,        // 입력창 크기 조절바 사용 여부 (true:사용/ false:사용하지 않음)
-            bUseModeChanger : true,            // 모드 탭(Editor | HTML | TEXT) 사용 여부 (true:사용/ false:사용하지 않음)
-            fOnBeforeUnload : function(){
-            }
-        }, //boolean
-        fOnAppLoad : function(){
-            //예제 코드
-            //oEditors.getById["contents"].exec("PASTE_HTML", ["로딩이 완료된 후에 본문에 삽입되는 text입니다."]);
-        },
-        fCreator: "createSEditor2"
-    });
-})
-</script>
 </head>
 <body>
 
 <div class="page-wrapper">
   <div class="content-container">
 
+<<<<<<< HEAD
     <form class="content-form" method="post" id="frm" 
     	action="${pageContext.request.contextPath}/vendor/${isEdit ? 'content_update' : 'content_create'}" enctype="multipart/form-data">
 
     <input type="hidden" name="content_id" value="${contentVO.content_id}">
+=======
+    <form class="content-form" method="post" action="<c:choose><c:when test='${isEdit}'>update</c:when><c:otherwise>create</c:otherwise></c:choose>">
+
+    <!-- 수정 모드일 때 content_id 전달 -->
+    <c:if test="${isEdit}">
+        <input type="hidden" name="content_id" value="${content.content_id}">
+    </c:if>
+>>>>>>> origin
 
     <!-- 상단 -->
     <button type="button" class="back-btn">←</button>
@@ -433,6 +384,7 @@ $(function() {
         <h2>기본 정보</h2>
         <hr>
 
+<<<<<<< HEAD
 		<div class="form-group">
             <label>종류 *</label>
             <div class="radio-group">
@@ -536,12 +488,23 @@ $(function() {
         <div class="form-group">
             <label>장소 *</label>
             <input type="text" name="location" placeholder="형식 : 도로명 주소 , 상호명 ( , 필수)" value="${contentVO.location}" required>
+=======
+        <div class="form-group">
+            <label>전시명</label>
+            <input type="text" name="title" placeholder="전시명을 입력하세요" value="${content.title}">
         </div>
 
         <div class="form-group">
-            <label>수령방법 *</label>
+            <label>장소</label>
+            <input type="text" name="location" placeholder="전시 장소를 입력하세요" value="${content.location}">
+>>>>>>> origin
+        </div>
+
+        <div class="form-group">
+            <label>수령방법</label>
             <div class="radio-group">
                 <label class="radio-item">
+<<<<<<< HEAD
                     <input type="radio" name="reservation_type" value="true" required <c:if test="${contentVO.reservation_type eq 'true'}">checked</c:if>>
                     <span>예매 필수</span>
                 </label>
@@ -601,21 +564,56 @@ $(function() {
             <label>판매자 엑스 주소</label>
             <div class="link-inputs">
                 <input type="text" name="x_url" placeholder="X URL" value="${contentVO.x_url}">
+=======
+                    <input type="radio" name="reservation_type" value="onsite" <c:if test="${content.reservation_type eq 'onsite'}">checked</c:if>>
+                    <span>현장수령</span>
+                </label>
+                <label class="radio-item">
+                    <input type="radio" name="reservation_type" value="advance" <c:if test="${content.reservation_type eq 'advance'}">checked</c:if>>
+                    <span>사전예매</span>
+                </label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>전시 기간</label>
+            <div class="date-range">
+            <p>시작일</p>
+            <input type="date" name="start_at" value="${startDate}">
+            <p>~</p>
+            <p>종료일</p>
+            <input type="date" name="end_at" value="${endDate}">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>판매자 인스타그램 주소</label>
+            <div class="link-inputs">
+                <input type="text" name="instagram_url" placeholder="INSTAGRAM URL" value="${content.instagram_url}">
+            </div>
+            <label>판매자 엑스 주소</label>
+            <div class="link-inputs">
+                <input type="text" name="x_url" placeholder="X URL" value="${content.x_url}">
+>>>>>>> origin
             </div>
         </div>
     </section>
 
     <!--  대표 포스터 -->
     <section class="form-section">
-    <h2>대표 포스터 *</h2>
+    <h2>대표 포스터</h2>
     <hr>
 
     <!-- 업로드 버튼 -->
     <div class="poster-upload-header">
+<<<<<<< HEAD
         <c:if test="${empty contentVO.main_image_path}">
 	        <label for="posterInput" class="upload-btn">이미지 추가</label>
 		</c:if>
         <input type="file" name="main_image_file" id="posterInput" accept="image/*">
+=======
+        <label for="posterInput" class="upload-btn">이미지 추가</label>
+        <input type="file" id="posterInput" accept="image/*">
+>>>>>>> origin
     </div>
 
     <!-- 포스터 미리보기 영역 -->
@@ -642,8 +640,9 @@ $(function() {
 
     <div class="form-row">
         <div class="form-group">
-            <label>관람료 *</label>
+            <label>관람료</label>
             <div>
+<<<<<<< HEAD
                 <span>성인</span><input type="number" name="adult_price" placeholder="0" value="${contentVO.adult_price}" required>원
             </div>
             <div>
@@ -651,27 +650,56 @@ $(function() {
             </div>
             <div>
                 <span>유아</span><input type="number" name="child_price" placeholder="0" value="${contentVO.child_price}" required>원
+=======
+                <span>성인</span><input type="number" name="adult_price" placeholder="0" value="${content.adult_price}">원
+            </div>
+            <div>
+                <span>청소년</span><input type="number" name="teen_price" placeholder="0" value="${content.teen_price}">원
+            </div>
+            <div>
+                <span>유아</span><input type="number" name="child_price" placeholder="0" value="${content.child_price}">원
+>>>>>>> origin
             </div>
         </div>
 
         <div class="form-group">
             <div>
-            <br><br><br><br>
+                <span>월~목</span>
                 <label>운영 시간</label>
+<<<<<<< HEAD
                 <input type="text" name="content_time" placeholder="00:00 ~ 00:00" value="${contentVO.content_time}">
+=======
+                <input type="text" name="content_time_weekday" placeholder="00:00 ~ 00:00" value="${content.content_time}">
+            </div>
+            <div>
+                <span>금~일</span>
+                <label>운영 시간</label>
+                <input type="text" name="content_time_weekend" placeholder="00:00 ~ 00:00" value="${content.content_time}">
+>>>>>>> origin
             </div>
         </div>
     </div>
     </section>
 
+    
 
     <!-- 상세 소개 (에디터) -->
     <section class="form-section">
+<<<<<<< HEAD
 	    <h2>상세 소개</h2>
 	    <hr>
 	
 	    <!-- 네이버 에디터 placeholder -->
 	    <textarea name="detail_description" id="detail_description" style="width:100%;">${contentVO.detail_description }</textarea>
+=======
+    <h2>상세 소개 (에디터)</h2>
+    <hr>
+
+    <!-- 네이버 에디터 placeholder -->
+    <div class="editor-placeholder">
+        네이버 스마트 에디터 영역 -> 수업내용 reply -> edit.jsp 참고
+    </div>
+>>>>>>> origin
     </section>
 
     <!-- 하단 버튼 -->
@@ -730,6 +758,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+<<<<<<< HEAD
     //상시 버튼에 따라 숨기기
     document.querySelectorAll('input[name="reservation_type"]').forEach(radio => {
         radio.addEventListener("change", () => {
@@ -768,6 +797,8 @@ document.addEventListener('DOMContentLoaded', function() {
             updateAddButtonState();
         }
     });
+=======
+>>>>>>> origin
 
     // 포스터 이미지 업로드 미리보기
     const posterInput = document.getElementById('posterInput');
@@ -833,8 +864,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // 필수 필드 검사
             const title = form.querySelector('input[placeholder="전시명을 입력하세요"]');
-            const location = form.querySelector('input[name="location"]');
-            const receiveMethod = form.querySelector('input[name="reservation_type"]:checked');
+            const location = form.querySelector('input[placeholder="전시 장소를 입력하세요"]');
+            const receiveMethod = form.querySelector('input[name="receive-method"]:checked');
 
             let isValid = true;
             let errorMessages = [];
@@ -874,6 +905,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // 유효성 검사 통과 시 폼 제출
             if (confirm('전시를 등록하시겠습니까?')) {
+<<<<<<< HEAD
             	oEditors.getById["detail_description"].exec("UPDATE_CONTENTS_FIELD", []);
             	 const reservation = document.querySelector('input[name="reservation_type"]:checked').value;
 
@@ -882,6 +914,9 @@ document.addEventListener('DOMContentLoaded', function() {
             	        document.querySelectorAll('input[name="Time[]"]').forEach(e => e.remove());
             	    }
             	document.getElementById("frm").submit();
+=======
+                form.submit();
+>>>>>>> origin
             }
         });
     }
@@ -895,7 +930,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
-    
 });
 </script>
 
