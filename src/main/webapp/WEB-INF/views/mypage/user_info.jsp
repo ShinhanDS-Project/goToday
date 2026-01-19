@@ -1,12 +1,33 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
+
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title>비밀번호 확인</title>
 </head>
+
 <body>
 
+	<h2>내정보수정</h2>
+	<hr>
+
+	<br>
+	<br>
+	<br>
+	<br>
+	<br>
+
+	<div align="center">
+		<h3>비밀번호 입력</h3>
+
+		<input type="password" size="30" style="height: 30px;"> <br>
+		<br> <a href="info_update_form.html">
+			<button style="padding: 10px 20px;">확인</button>
+		</a>
+	</div>
+
 </body>
+
 </html>
