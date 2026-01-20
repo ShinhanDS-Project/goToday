@@ -19,7 +19,11 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+<<<<<<< HEAD
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+=======
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+>>>>>>> 0390013b8e1b2684066cc3fcdd2ac2cf330cdd34
 import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -40,7 +44,8 @@ public class MvcConfig implements WebMvcConfigurer{
 	private String username;
 	@Value("${db.password}")
 	private String password;
-	
+	//사진 관련 
+
 
 	public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
 		configurer.enable();
@@ -57,9 +62,7 @@ public class MvcConfig implements WebMvcConfigurer{
 	@Primary
 	public HikariDataSource dataSource() {
 		HikariDataSource dataSource = new HikariDataSource();
-//		dataSource.setDriverClassName("org.mariadb.jdbc.Driver");
 		dataSource.setDriverClassName(driver);
-//		dataSource.setJdbcUrl("jdbc:mariadb://localhost:3306/study");
 		dataSource.setJdbcUrl(url);
 		dataSource.setUsername(username);
 		dataSource.setPassword(password);
@@ -95,7 +98,14 @@ public class MvcConfig implements WebMvcConfigurer{
 	@Bean
 	public static PropertyPlaceholderConfigurer properties() {
 		PropertyPlaceholderConfigurer config = new PropertyPlaceholderConfigurer();
+<<<<<<< HEAD
 		config.setLocation(new ClassPathResource("db.properties"));
+=======
+		config.setLocations(
+				new ClassPathResource("db.properties"),
+				new ClassPathResource("api.properties")
+			);
+>>>>>>> 0390013b8e1b2684066cc3fcdd2ac2cf330cdd34
 		return config;
 	}
 	

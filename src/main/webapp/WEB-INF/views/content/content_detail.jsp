@@ -1,109 +1,215 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8" />
-  <title>콘텐츠 상세</title>
+  <title>GoToday | ${content.title}</title>
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js'></script>
+  
   <style>
-    .poster, .posterDetail { 
-      width: 300px;
-    }
+    /* 1. 기본 및 네비게이션 스타일 (메인과 100% 일치) */
+    :root { --main-color: #4dc3ff; --border-color: #eee; --text-gray: #666; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Pretendard', sans-serif; color: #333; background-color: #fff; overflow-x: hidden; }
+    a { text-decoration: none; color: inherit; }
+
+    .header { width: 100%; border-bottom: 1px solid #eee; background: #fff; position: sticky; top: 0; z-index: 1000; }
+    .nav-container { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; height: 70px; }
+    .logo img { height: 32px; cursor: pointer; display: block; }
+    
+    .nav-menu { display: flex; gap: 35px; list-style: none; align-items: center; height: 100%; }
+    .nav-menu li { position: relative; height: 100%; display: flex; align-items: center; }
+    .nav-menu a { font-weight: 600; font-size: 15px; transition: color 0.3s ease; height: 100%; display: flex; align-items: center; padding: 0 5px; }
+    .nav-menu li:hover a { color: var(--main-color); }
+    .nav-menu li::after { content: ""; position: absolute; bottom: -1px; left: 0; width: 0; height: 3px; background-color: var(--main-color); transition: width 0.3s ease; }
+    .nav-menu li:hover::after { width: 100%; }
+
+    /* 우측 아이콘 섹션 (검색창 복구) */
+    .nav-icons { display: flex; gap: 20px; align-items: center; }
+    .search-bar { border-bottom: 1px solid #333; display: flex; align-items: center; padding: 2px 5px; }
+    .search-bar input { border: none; outline: none; width: 150px; font-size: 14px; }
+    .user-icon { font-size: 22px; cursor: pointer; transition: color 0.2s; }
+    .user-icon:hover { color: var(--main-color); }
+
+    /* 2. 상단 레이아웃 */
+    .container { max-width: 1100px; margin: 40px auto; padding: 0 20px; }
+    .breadcrumb { font-size: 13px; color: var(--text-gray); margin-bottom: 10px; }
+    .content-title-area { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #333; padding-bottom: 15px; margin-bottom: 30px; }
+    .content-title-area h1 { margin: 0; font-size: 28px; letter-spacing: -1px; }
+    .sns-group { display: flex; gap: 10px; }
+    .sns-group img { width: 22px; cursor: pointer; opacity: 0.7; }
+
+    .main-box { display: flex; gap: 50px; align-items: flex-start; margin-bottom: 60px; }
+    .poster-side { flex: 0 0 350px; } 
+    .poster-img { width: 100%; height: 480px; object-fit: cover; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+    
+    .poster-like-btn { display: flex; align-items: center; gap: 8px; margin-top: 15px; font-weight: bold; color: #444; background: none; border: none; cursor: pointer; font-size: 18px; }
+    .poster-like-btn .heart-icon { color: var(--main-color); font-size: 20px; }
+
+    .info-side { flex: 1; }
+    .info-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+    .info-table th { text-align: left; width: 100px; padding: 12px 0; color: #333; font-size: 15px; vertical-align: top; }
+    .info-table td { padding: 12px 0; font-size: 15px; color: #555; line-height: 1.6; }
+
+    .reserve-section { display: flex; gap: 20px; border-top: 1px solid #eee; padding-top: 30px; }
+    #calendar { flex: 1.2; border: 1px solid #eee; border-radius: 10px; padding: 10px; font-size: 12px; }
+    .time-selector { flex: 1; border: 1px solid #eee; border-radius: 10px; padding: 15px; background: #fafafa; }
+    .time-title { font-weight: bold; font-size: 14px; margin-bottom: 15px; display: block; }
+    .time-option { display: flex; align-items: center; padding: 10px; background: #fff; border: 1px solid #eee; border-radius: 6px; margin-bottom: 8px; cursor: pointer; }
+
+    .action-btns { display: flex; gap: 10px; margin-top: 25px; align-items: stretch; }
+    .btn-reserve { flex: 2; background: var(--main-color); color: #fff; border: none; padding: 16px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+    .btn-save-cal { flex: 1; background: #f8f9fa; border: 1px solid #ddd; color: #444; padding: 16px; border-radius: 6px; font-weight: 600; cursor: pointer; }
+
+    /* 3단계 탭 메뉴 비율 조정 */
+    .tab-wrapper { margin-top: 50px; }
+    .tab-menu { display: flex; list-style: none; border-bottom: 2px solid #eee; margin-bottom: 30px; }
+    .tab-item { flex: 1; padding: 18px 0; cursor: pointer; font-weight: bold; color: #999; text-align: center; transition: 0.3s; }
+    .tab-item.active { color: #333; border-bottom: 3px solid var(--main-color); }
+    
+    .tab-panel { display: none; padding: 20px 0; }
+    .tab-panel.active { display: block; }
+    .detail-content { line-height: 1.8; color: #444; font-size: 16px; margin-bottom: 20px; }
+    .detail-img { width: 100%; border-radius: 8px; }
+
+    /* 리뷰 및 문의사항 스타일 */
+    .review-summary { display: flex; gap: 40px; background: #fcfcfc; padding: 30px; border-radius: 12px; margin-bottom: 40px; }
+    .rating-bars { list-style: none; flex: 1; }
+    .rating-bars li { display: flex; align-items: center; gap: 10px; margin-bottom: 5px; font-size: 13px; }
+    .bar { flex: 1; height: 8px; background: #eee; border-radius: 4px; overflow: hidden; }
+    .fill { height: 100%; background: var(--main-color); }
+    .review-list, .qna-list { list-style: none; }
+    .review-item, .qna-item { padding: 20px 0; border-bottom: 1px solid #eee; }
   </style>
+
+  <script>
+    $(function() {
+      // 1. 3단계 탭 전환
+      $(".tab-item").click(function() {
+        $(".tab-item").removeClass("active");
+        $(this).addClass("active");
+        $(".tab-panel").removeClass("active").eq($(this).index()).addClass("active");
+      });
+
+      // 2. 달력 및 AJAX
+      const calendarEl = document.getElementById('calendar');
+      if (calendarEl) {
+        const calendar = new FullCalendar.Calendar(calendarEl, {
+          initialView: 'dayGridMonth', locale: 'ko', height: 'auto',
+          dateClick: function(info) {
+            $(".fc-daygrid-day").css("background", ""); 
+            $(info.dayEl).css("background", "rgba(77, 195, 255, 0.1)");
+            fetchTimes(info.dateStr);
+          }
+        });
+        calendar.render();
+      }
+
+      function fetchTimes(date) {
+        $.ajax({
+          url: "${pageContext.request.contextPath}/schedule/time",
+          data: { content_id: $("#content_id").val(), scheduled_at: date },
+          success: function(res) {
+            let html = `<span class="time-title">\${date} 시간 선택</span>`;
+            if(!res || res.length === 0) {
+              html += "<p style='font-size:12px; color:#999; margin-top:20px;'>예정된 회차가 없습니다.</p>";
+            } else {
+              res.forEach(sch => {
+                html += `
+                  <label class="time-option">
+                    <input type="radio" name="sch_radio" data-id="\${sch.schedule_id}">
+                    <span style="flex:1; margin-left:10px;">\${sch.time_zone}</span>
+                    <span style="font-size:12px;">\${sch.current_ticket}석</span>
+                  </label>`;
+              });
+            }
+            $(".reservation_timezone").html(html);
+          }
+        });
+      }
+
+      // 3. 좋아요 토글
+      $("#likeBtn").click(function() {
+          const heart = $(this).find(".heart-icon");
+          const count = $(this).find(".like-count-num");
+          let num = parseInt(count.text());
+          if(heart.text() === "🤍") { heart.text("💙"); count.text(num + 1); } 
+          else { heart.text("🤍"); count.text(num - 1); }
+      });
+
+      // 4. 마이페이지 로그인 체크
+      $("#myPageBtn").click(function() {
+          const isLoggedIn = ${not empty loginSess};
+          if (!isLoggedIn) {
+              alert("로그인이 필요한 서비스입니다.");
+              location.href = "${pageContext.request.contextPath}/member/login";
+          } else {
+              location.href = "${pageContext.request.contextPath}/member/mypage";
+          }
+      });
+    });
+  </script>
 </head>
 <body>
 
-<div class="page-wrapper">
-  <div class="content-container">
-    <section class="top-area">
-      <div class="content-info">
-        <span>컨텐츠 &gt; 팝업</span>
-        <a href="#" class="tag">#미디어</a>
-        <h1>팝업 제목 : 치이카와 베이비 팝업</h1>
-        <p class="period">2026.01.01 ~ 2026.03.02</p>
-        <a href = "#" class="search-location">
-          <p class="location">홍대 어딘가</p>
+  <header class="header">
+    <div class="nav-container">
+      <div class="logo">
+        <a href="${pageContext.request.contextPath}/main">
+          <img src="<c:url value='/resources/images/logo.png'/>" alt="Logo">
         </a>
       </div>
-
-      <!-- 공유 버튼 그룹 -->
-      <div class="share-group">
-        <button class="share-btn" aria-label="인스타그램 링크">
-          <img src="icon-share.svg" alt="링크">
-        </button>
-        <button class="share-btn" aria-label="엑스 링크">
-          <img src="icon-share.svg" alt="링크">
-        </button>
-        <button class="share-btn" aria-label="공유">
-          <img src="icon-share.svg" alt="공유">
-        </button>
-
-        <ul class="share-list">
-          <li>
-            <a href="#" class="share-item instagram">
-              <img src="icon-instagram.svg" alt="카카오톡 공유">
-            </a>
-          </li>
-          <li>
-            <a href="#" class="share-item instagram">
-              <img src="icon-instagram.svg" alt="인스타그램 공유">
-            </a>
-          </li>
-          <li>
-            <a href="#" class="share-item facebook">
-              <img src="icon-facebook.svg" alt="엑스 공유">
-            </a>
-          </li>
-          <li>
-            <a href="#" class="share-item link">
-              <img src="icon-link.svg" alt="URL">
-            </a>
-          </li>
-        </ul>
-        
-      </div>
-
-    </section>
-    <!-- 좌측 영역 -->
-    <section class="left-area">
-      <div>
-        <img src="poster.jpg" alt="포스터" class="poster" />
-      </div>
-      <button class="like-btn" aria-label="좋아요">
-        <img src="icon-heart.svg" alt="좋아요">
-        <span class="like-count">123</span>
-      </button>
-    </section>
-
-    <!-- 우측 영역 -->
-    <section class="right-area">
-      <div class="info-box">
-        <p>소개</p>
-        <span>어쩌고 저쩌고 간략하게 소개하는 란</span>
-      </div>
       
-      <div class="price-box">
-        <p>관람료</p>
-        <ul>
-          <li>성인 17,000원</li>
-          <li>청소년 17,000원</li>
-        </ul>
+      <ul class="nav-menu">
+        <li><a href="#">Q&A</a></li>
+        <li><a href="${pageContext.request.contextPath}/popup">PopUp</a></li> 
+        <li><a href="${pageContext.request.contextPath}/exhibition">Exhibition</a></li>
+      </ul>
+
+      <div class="nav-icons">
+        <div class="search-bar">
+          <input type="text" placeholder="검색">
+          <span>🔍</span>
+        </div>
+        <span class="user-icon" id="myPageBtn">👤</span>
       </div>
+    </div>
+</header>
 
-      <div class="operating-hours">
-        <p>운영시간</p>
-        <span>10 : 00 ~ 18 : 00</span>
+  <div class="container">
+    <div class="breadcrumb">콘텐츠 > ${content.contentKindName} > <span>#${content.category}</span></div>
+    
+    <div class="content-title-area">
+      <div>
+        <h1>${content.title}</h1>
+        <p style="margin-top:8px; color:var(--text-gray);">${content.start_at} ~ ${content.end_at} &nbsp;|&nbsp; ${content.location} 📍</p>
       </div>
-
-      <div class="receive-method">
-        <p>수령방법</p>
-        <span>사전예매</span>
+      <div class="sns-group">
+        <img src="https://cdn-icons-png.flaticon.com/512/733/733579.png" alt="X">
+        <img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" alt="IG">
+        <img src="https://cdn-icons-png.flaticon.com/512/1358/1358023.png" alt="Link">
       </div>
+    </div>
 
+    <div class="main-box">
+      <section class="poster-side">
+        <img class="poster-img" src="${pageContext.request.contextPath}${content.main_image_path}">
+        <button type="button" class="poster-like-btn" id="likeBtn">
+          <span class="heart-icon">🤍</span> <span class="like-count-num">${content.like_count}</span>
+        </button>
+      </section>
 
-      <!-- 예약 영역 -->
-      <div class="reservation-box">
+      <section class="info-side">
+        <table class="info-table">
+          <tr><th>소개</th><td>${content.description}</td></tr>
+          <tr><th>관람료</th><td>성인 ${content.adult_price}원 / 청소년 ${content.teen_price}원</td></tr>
+          <tr><th>운영시간</th><td>${content.content_time}</td></tr>
+          <tr><th>수령방법</th><td>${content.reservationTypeLabel}</td></tr>
+        </table>
 
+<<<<<<< HEAD
         <!-- 날짜 선택 -->
         <label>날짜 선택</label>
         <input type="date" id="dateInput" />
@@ -123,185 +229,74 @@
             </option>
           </select>
           <ul id="timeSlotList"></ul>
+=======
+        <div class="reserve-section">
+          <div id="calendar"></div>
+          <div class="time-selector">
+            <div class="reservation_timezone">
+              <span class="time-title">시간대 선택</span>
+              <p style="font-size:12px; color:#999; margin-top:20px;">먼저 달력에서 날짜를 선택해주세요.</p>
+            </div>
+          </div>
+>>>>>>> 0390013b8e1b2684066cc3fcdd2ac2cf330cdd34
         </div>
 
-        <button class="reserve-btn">예매하기</button>
-        <button class="calendar-btn">캘린더에 저장하기</button>
-      </div>
-    </section>
+        <div class="action-btns">
+          <input type="hidden" id="content_id" value="${content.content_id}">
+          <button class="btn-reserve">예매하기</button>
+          <button class="btn-save-cal">캘린더 저장하기</button>
+        </div>
+      </section>
+    </div>
 
-    <!-- 탭 영역 -->
     <div class="tab-wrapper">
-
-      <!-- 탭 메뉴 -->
       <ul class="tab-menu">
         <li class="tab-item active">상세정보</li>
         <li class="tab-item">리뷰</li>
+        <li class="tab-item">문의사항</li>
       </ul>
 
-      <!-- 탭 콘텐츠 -->
       <div class="tab-content">
-
-        <!-- 상세정보 -->
         <section class="tab-panel active">
-          <h2>상세 정보</h2>
-          <p>
-            해당 전시는 어쩌고 저쩌고 설명이 들어갑니다.<br />
-            전시 소개, 유의사항, 관람 정보 등을 보여줍니다.
-          </p>
-          <img src="detail.jpg" alt="포스터" class="posterDetail" />
+          <div class="detail-content">${content.detail_description}</div>
+          <c:if test="${not empty content.main_image_path}">
+            <img src="${pageContext.request.contextPath}${content.main_image_path}" class="detail-img">
+          </c:if>
         </section>
 
-        <!-- 리뷰 탭 전체 -->
-        <section class="review-section">
-
-          <!-- 리뷰 요약 영역 -->
+        <section class="tab-panel">
           <div class="review-summary">
-
-            <!-- 좌측: 전체 별점 분포 -->
-            <div class="rating-summary-left">
-              <h3>별점 분포</h3>
-
-              <div class="average-score">
-                <span class="score">4.7</span>
-                <span class="stars">★★★★★</span>
-                <span class="count">(총 34개 리뷰)</span>
-              </div>
-
-              <!-- 별점별 막대(개수 숫자로 보여주고 바 형식으로 시각화) -->
-              <ul class="rating-bars">
-                <li>
-                  <span class="label">5점</span>
-                  <div class="bar">
-                    <div class="fill" style="width: 80%;"></div>
-                  </div>
-                  <span class="value">24</span>
-                </li>
-                <li>
-                  <span class="label">4점</span>
-                  <div class="bar">
-                    <div class="fill" style="width: 60%;"></div>
-                  </div>
-                  <span class="value">7</span>
-                </li>
-                <li>
-                  <span class="label">3점</span>
-                  <div class="bar">
-                    <div class="fill" style="width: 20%;"></div>
-                  </div>
-                  <span class="value">3</span>
-                </li>
-                <li>
-                  <span class="label">2점</span>
-                  <div class="bar">
-                    <div class="fill"></div>
-                  </div>
-                  <span class="value">0</span>
-                </li>
-                <li>
-                  <span class="label">1점</span>
-                  <div class="bar">
-                    <div class="fill"></div>
-                  </div>
-                  <span class="value">0</span>
-                </li>
-              </ul>
+            <div style="flex:0.4; text-align:center; border-right:1px solid #eee;">
+              <h3 style="font-size:45px; color:var(--main-color);">4.7</h3>
+              <p style="color:#ffd700; font-size:18px;">★★★★★</p>
+              <p style="font-size:13px; color:#999; margin-top:5px;">총 34개 리뷰</p>
             </div>
-
-            <!-- 우측: 시간대별 평균 -->
-            <div class="rating-summary-right">
-              <h3>방문 시간대별 평점</h3>
-
-              <ul class="time-rating-list">
-                <li>
-                  <span class="time">10:00 ~ 12:00</span>
-                  <span class="stars">★★★★★</span>
-                  <span class="score">5.0</span>
-                </li>
-                <li>
-                  <span class="time">12:00 ~ 14:00</span>
-                  <span class="stars">★★★★☆</span>
-                  <span class="score">4.0</span>
-                </li>
-                <li>
-                  <span class="time">14:00 ~ 16:00</span>
-                  <span class="stars">★★★★★</span>
-                  <span class="score">5.0</span>
-                </li>
-              </ul>
-            </div>
-
+            <ul class="rating-bars" style="margin-left:40px;">
+              <li>5점 <div class="bar"><div class="fill" style="width:80%;"></div></div> 24</li>
+              <li>4점 <div class="bar"><div class="fill" style="width:15%;"></div></div> 7</li>
+              <li>3점 <div class="bar"><div class="fill" style="width:5%;"></div></div> 3</li>
+            </ul>
           </div>
-
-          <!-- 리뷰 리스트 헤더 -->
-          <div class="review-list-header">
-            <h3>리뷰 목록 (총개수)</h3>
-
-            <!-- 정렬 버튼 -->
-            <select class="review-sort">
-              <option value="latest">최신순</option>
-              <option value="high">별점 높은순</option>
-              <option value="low">별점 낮은순</option>
-            </select>
-          </div>
-
-          <!-- 리뷰 리스트 : 더보기 누르면 추가 -->
           <ul class="review-list">
-            
-            
-            <!-- 리뷰 아이템 -->
-            <li class="review-item">
-              <div class="review-header">
-                <span class="user">김*</span>
-                <span class="stars">★★★★★</span>
-                <span class="date">2026.01.13</span>
-              </div>
-              
-              <div class="review-meta">
-                <span class="time-slot">10:00 ~ 12:00</span>
-              </div>
-              
-              <p class="review-content">
-                오전 시간대 방문했는데 사람도 적당하고 좋았습니다.
-                작품 설명도 자세해서 이해하기 좋았어요.
-              </p>
-              
-              <div class="review-images">
-                <img src="review1.jpg" alt="리뷰 이미지" />
-              </div>
-            </li>
-            
-            <!-- 리뷰 아이템 -->
-            <li class="review-item">
-              <div class="review-header">
-                <span class="user">박*</span>
-                <span class="stars">★★★★☆</span>
-                <span class="date">2026.01.12</span>
-              </div>
-              
-              <div class="review-meta">
-                <span class="time-slot">12:00 ~ 14:00</span>
-              </div>
-              
-              <p class="review-content">
-                전시는 재밌었는데 점심시간이라 사람이 조금 많았어요.
-              </p>
-            </li>
-            
-            <!-- 페이징 / 더보기 -->
-            <div class="review-pagination">
-              <button class="load-more">리뷰 더보기</button>
-            </div>
-            
+            <li class="review-item"><strong>김*님</strong> <span style="float:right; color:#ccc;">2026.01.13</span><p style="margin-top:10px;">전시가 너무 예쁘네요!</p></li>
           </ul>
-
         </section>
 
+        <section class="tab-panel">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <p style="color:var(--text-gray);">컨텐츠에 대해 궁금한 점을 문의해 주세요.</p>
+            <button style="padding:8px 16px; background:#333; color:#fff; border:none; border-radius:4px; cursor:pointer;">문의하기</button>
+          </div>
+          <ul class="qna-list">
+            <li class="qna-item">
+              <span style="background:#eee; padding:2px 6px; font-size:12px; border-radius:3px;">답변대기</span>
+              <span style="margin-left:10px;">재입장이 가능한가요?</span>
+              <span style="float:right; color:#ccc;">이*님 | 2026.01.19</span>
+            </li>
+          </ul>
+        </section>
       </div>
     </div>
-    
   </div>
-</div>
-
 </body>
 </html>

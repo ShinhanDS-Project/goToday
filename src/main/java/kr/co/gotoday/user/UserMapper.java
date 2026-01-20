@@ -1,5 +1,37 @@
 package kr.co.gotoday.user;
 
+<<<<<<< HEAD
 public class UserMapper {
 
+=======
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+
+@Mapper
+public interface UserMapper {
+	UserVO login(UserVO vo);
+    int register(UserVO vo);
+    void createUserTags(UserTagVO vo);
+    Long findTagIdByName(String tagName);
+    Integer emailCheck(String email);
+    
+    // 카카오 로그인 
+    int insertKakaoUser(UserVO vo);
+    UserVO loginByEmail(String email);
+    
+    // 관리자 로그인
+    UserVO adminLogin(UserVO vo);
+    
+    // 관심사 수정
+    List<String> getUserTagNames(int userId);
+    void deleteUserTags(int userId);
+    void insertUserTag(UserTagVO vo);
+    
+    // 회원정보 수정
+    UserVO getUserById(int userId);
+    int updateUserInfo(UserVO vo);
+    
+    void createUserTagsBatch(List<UserTagVO> list);
+>>>>>>> 0390013b8e1b2684066cc3fcdd2ac2cf330cdd34
 }
