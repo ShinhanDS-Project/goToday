@@ -250,5 +250,40 @@ public class ReservationServiceImpl implements ReservationService{
 	 
 
 	
+<<<<<<< Updated upstream
+=======
+	//별도의 휴대폰번호 파싱 메서드
+	public String formatPhone(String phone) {
+	    if (phone == null) return "";
+
+	    // 숫자만 남기기 (혹시 - 들어온 경우 대비)
+	    phone = phone.replaceAll("[^0-9]", "");
+
+	    // 010xxxxxxxx (11자리)만 포맷
+	    if (phone.length() == 11) {
+	        return phone.replaceFirst(
+	            "(\\d{3})(\\d{4})(\\d{4})",
+	            "$1-$2-$3"
+	        );
+	    }
+
+	    // 집 전화의 경우
+	    if (phone.length() == 10) {
+	        return phone.replaceFirst(
+	            "(\\d{3})(\\d{3})(\\d{4})",
+	            "$1-$2-$3"
+	        );
+	    }
+
+	    // 그 외는 원본 그대로
+	    return phone;
+	}
+
+	@Override
+	public ReservationVO confirmReservationByReservationId(int reservation_id) {
+		return reservationMapper.findByReservationId(reservation_id);
+	}
+
+>>>>>>> Stashed changes
 	
 }

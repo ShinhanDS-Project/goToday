@@ -25,4 +25,12 @@ public interface ReservationService {
 	void updatePaymentStatus(String order_key);
 	
 	int updateReservationStatusById(int reservation_id);
+<<<<<<< Updated upstream
+=======
+	
+	List<ReservationListDTO> findReservationListByUserId(int user_id);
+	
+	ReservationDetailDTO findReservationDetailById(int reservation_id, int user_id);
+	ReservationVO confirmReservationByReservationId(int reservation_id);
+>>>>>>> Stashed changes
 }
