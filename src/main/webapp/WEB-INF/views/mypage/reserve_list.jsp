@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -65,6 +66,21 @@ body {
     font-weight: 700;
     background: #e1f5fe;
     color: #03a9f4;
+}
+
+.badge.canceled {
+    background: #ffebee;
+    color: #ff4444;
+}
+
+.badge.end {
+    background: #eee;
+    color: #888;
+}
+
+.badge.dday {
+    background: #fff3cd;
+    color: #ff9800;
 }
 
 .title {
@@ -187,7 +203,12 @@ body {
                 <div class="reserve-code">${r.reservation_code}</div>
 
                 <div class="title-line">
-                    <span class="badge">${r.dday}</span>
+                    <span class="badge
+					    ${r.dday eq 'CANCELED' ? 'cancel' :
+					      r.dday eq 'END' ? 'end' :
+					      r.dday eq 'D-DAY' ? 'dday' : ''}">
+					    ${r.dday}
+					</span>
                     <span class="title">${r.title}</span>
                 </div>
 

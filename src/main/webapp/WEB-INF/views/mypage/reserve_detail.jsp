@@ -26,9 +26,9 @@
     }
 
     .page-title { 
-        font-size: 32px; 
-        font-weight: 700; 
-        color: #111;
+		font-size: 28px;
+	    font-weight: 700;
+	    margin-bottom: 30px;
     }
 
     /* 우측 끝 동그란 < 버튼 */
