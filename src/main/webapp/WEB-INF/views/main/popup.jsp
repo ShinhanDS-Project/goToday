@@ -8,8 +8,8 @@
 <title>POPUP</title>
 <style>
 /* 1. 공통 기본 스타일 */
-:root { 
-	--main-color: #4dc3ff;
+:root { -
+	-main-color: #4dc3ff;
 }
 
 * {
@@ -518,22 +518,9 @@ a {
 			<%-- 1. 로그인 여부 확인 (세션 이름 확인 필수) --%>
 			<c:set var="isLoggedIn" value="${not empty loginSess}" />
 
-            <c:if test="${isBlur}">
-                <div class="cta-overlay">
-                    <c:choose>
-                        <c:when test="${!isLoggedIn}">
-                            <h3>로그인이 필요한 서비스입니다</h3>
-                            <p>로그인하시면 당신의 취향에 딱 맞는<br>다양한 팝업을 추천해드려요!</p>
-                            <a href="${pageContext.request.contextPath}/member/login" class="cta-btn">로그인하러 가기</a>
-                        </c:when>
-                        <c:otherwise>
-                            <h3>관심사 등록 전이신가요?</h3>
-                            <p>관심사를 설정하면 당신만을 위한<br>특별한 맞춤 콘텐츠를 추천해드려요!</p>
-                            <a href="${pageContext.request.contextPath}/mypage/user_like_edit" class="cta-btn">관심사 설정하기</a>
-                        </c:otherwise>
-                    </c:choose>
-                </div>
-            </c:if>
+			<%-- 2. 추천 리스트가 비어있는지 확인 --%>
+			<%-- 기존의 recommand[0].blur 조건이 까다로워서 오작동할 확률이 높으므로 단순화합니다 --%>
+			<c:set var="isTagEmpty" value="${empty recommand}" />
 
 			<%-- 3. 블러 처리 여부 결정: 로그인을 안 했거나, 추천 데이터가 아예 없을 때 --%>
 			<c:set var="isBlur" value="${!isLoggedIn or isTagEmpty}" />
