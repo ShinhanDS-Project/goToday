@@ -133,4 +133,16 @@ public class ReviewServiceImpl implements ReviewService{
 	    if (email == null || email.length() < 3) return "***";
 	    return email.substring(0, 3) + "****";
 	}
+
+	@Override
+	public List<ReviewVO> findReviewsByUserIdPaged(int user_id, int page, int limit) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int countReviewsByUserId(int user_id) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 }

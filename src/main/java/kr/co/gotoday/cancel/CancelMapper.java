@@ -18,7 +18,7 @@ public interface CancelMapper {
     // 3. 스케줄 조회 (이건 이제 Service에서 안 쓰지만, 놔둬도 상관없음)
     ContentScheduleVO findContentScheduleByScheduleId(int scheduleId);
     
-    // [★수정됨] 4. 결제 취소 정보 업데이트 (VO 통째로 받기)
+    // 4. 결제 취소 정보 업데이트 (VO 통째로 받기)
     int updatePaymentCancelInfo(PaymentVO payment);
     
     // 5. 예약 취소

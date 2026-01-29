@@ -1,11 +1,12 @@
 package kr.co.gotoday.cancel;
 
 import java.io.OutputStream;
+
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;         // [추가]
-import java.time.temporal.ChronoUnit; // [추가]
+import java.time.LocalDate;         
+import java.time.temporal.ChronoUnit; 
 import java.util.Base64;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +51,7 @@ public class CancelServiceImpl implements CancelService{
         String refundStatusLog = "";
 
         if (isFreePayment) {
-            // ✅ 0원 취소
+            // 0원 취소
             cancelAmount = 0;
             refundStatusLog = "FREE_CANCEL";
         } else {
@@ -97,7 +98,7 @@ public class CancelServiceImpl implements CancelService{
 	        // 금액(cancelAmount)이 있을 때만 호출
 	        if (cancelAmount > 0) {
 	            String paymentKey = payment.getPayment_key();
-	            // [수정] 금액을 같이 보냄
+	            // 금액을 같이 보냄
 	            sendCancelRequestToToss(paymentKey, cancelReason, cancelAmount);
 	        }
         }
@@ -111,8 +112,7 @@ public class CancelServiceImpl implements CancelService{
         int targetScheduleId = reservation.getSchedule_id();
         int stockResult = cancelMapper.increaseTicketStock(targetScheduleId, cancelTicketCount);
         
-        // (3) 결제 정보 업데이트 [수정]
-        // VO에 계산된 값들을 채워서 Mapper로 보냅니다.
+        // (3) 결제 정보 업데이트
         payment.setPayment_status("CANCELED");
         payment.setRefund_status(refundStatusLog);
         payment.setCancel_amount(cancelAmount);
@@ -139,7 +139,7 @@ public class CancelServiceImpl implements CancelService{
         connection.setRequestProperty("Authorization", "Basic " + encodedAuth);
         connection.setDoOutput(true);
 
-        // [수정] JSON Body에 cancelAmount 추가
+       
         String jsonBody = "{" +
                           "\"cancelReason\":\"" + cancelReason + "\"," + 
                           "\"cancelAmount\":" + cancelAmount + 

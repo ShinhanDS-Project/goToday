@@ -58,7 +58,7 @@ body {
 </style>
 
 <script>
-    // 1. [중요] JSP의 ContextPath를 자바스크립트 변수로 미리 빼둡니다. (충돌 방지)
+   
     var contextPath = "${pageContext.request.contextPath}";
     var myEvents = [];
 
@@ -72,7 +72,7 @@ body {
             selectable : true, 
             height: 700, 
 
-            // [중요] 날짜 클릭 시 실행
+            // 날짜 클릭 시 실행
             dateClick : function(info) {
                 // (1) 날짜 가져오기
                 var clickedDate = info.dateStr;
@@ -94,7 +94,7 @@ body {
                         // 색상 점 만들기
                         var colorDot = '<span style="color:' + event.color + '; margin-right:8px;">●</span>';
                         
-                        // ★ [수정됨] 백틱(`) 대신 따옴표(')와 더하기(+)를 사용해서 안전하게 연결합니다.
+                     
                         
                         if (event.color === '#4dc3ff') { 
                             // [CASE 1] 파란색(예약) -> 상세 페이지 이동

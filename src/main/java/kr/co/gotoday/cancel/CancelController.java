@@ -18,13 +18,13 @@ public class CancelController {
 
     @PostMapping("/payment/cancel.do")
     @ResponseBody
-    // ★ 수정: @RequestParam 대신 @RequestBody Map<String, Object> params 사용
+    
     public ResponseEntity<Map<String, Object>> cancelPayment(@RequestBody Map<String, Object> params) {
         
         Map<String, Object> result = new HashMap<>();
 
         try {
-            // ★ JSON 맵에서 하나씩 꺼내기
+            //JSON 맵에서 하나씩 꺼내기
             String orderId = (String) params.get("orderId");
             String reason = (String) params.get("reason");
 
