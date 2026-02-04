@@ -44,8 +44,7 @@ public class ContentServiceImpl implements ContentService {
 	@Override
 	public List<MainContentViewDTO> getRecommendContents(MainContentDTO mcd) {
 	    if (mcd != null && mcd.getUser_id() != null) {
-	        
-	        List<TagVO> tagAll = userMapper.getUserTags(mcd.getUser_id());
+	    	List<TagVO> tagAll=userMapper.getUserTags(mcd.getUser_id());
 	        
 	        List<String> location = new ArrayList<>();
 	        List<String> interest = new ArrayList<>();
@@ -74,8 +73,14 @@ public class ContentServiceImpl implements ContentService {
 	    }
 	    
 	    // 5. 이제 데이터가 꽉 찬 DTO를 들고 쿼리 실행
-	    List<ContentVO> list = contentMapper.findRecommendedContents(mcd);
-
+	    List<ContentVO> list=null;
+	    System.out.println("DEBUG content_kind = [" + mcd.getContent_kind() + "]");
+	    if(mcd.getContent_kind()==null) {
+	    list = contentMapper.findRecommendedContents(mcd);
+	    }
+	    else {
+	    list= contentMapper.findRecommendedContentsByKind(mcd);
+	    }
 	    return list.stream()
 	               .map(vo -> applyViewPolicy(vo, mcd))
 	               .collect(Collectors.toList());

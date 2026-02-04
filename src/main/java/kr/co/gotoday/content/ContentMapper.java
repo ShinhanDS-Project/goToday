@@ -39,4 +39,6 @@ public interface ContentMapper {
 	//
 	List<String> getTagName(@Param("user_id") int user_id);
 	int findVendorId(@Param("content_id") int content_id);
+
+	List<ContentVO> findRecommendedContentsByKind(MainContentDTO mcd);
 }
