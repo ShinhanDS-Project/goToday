@@ -441,4 +441,54 @@ WHERE
 	FROM content
 	WHERE content_id=#{content_id}
 </select>
+
+<select id="findRecommendedContentsByKind"
+        parameterType="kr.co.gotoday.content.MainContentDTO"
+        resultType="kr.co.gotoday.content.ContentVO">
+
+SELECT *
+FROM (
+    SELECT
+        c.*,
+        (
+
+            <!-- location -->
+            <choose>
+                <when test="locationTags != null and locationTags.size() > 0">
+                    CASE WHEN (
+                        <foreach collection="locationTags" item="t" separator=" OR ">
+                            c.location LIKE CONCAT('%', #{t}, '%')
+                        </foreach>
+                    ) THEN 3 ELSE 0 END
+                </when>
+                <otherwise>0</otherwise>
+            </choose>
+
+            +
+
+            <!-- interest -->
+            <choose>
+                <when test="interestTags != null and interestTags.size() > 0">
+                    CASE WHEN (
+                        <foreach collection="interestTags" item="t" separator=" OR ">
+                            c.category LIKE CONCAT('%', #{t}, '%')
+                        </foreach>
+                    ) THEN 7 ELSE 0 END
+                </when>
+                <otherwise>0</otherwise>
+            </choose>
+        ) AS weight_score
+    FROM content c
+    <where>
+        <include refid="USER_VISIBLE_CONTENT" />
+        AND c.end_at <![CDATA[>=]]> NOW()
+	AND TRIM(c.content_kind) = TRIM(#{content_kind})
+    </where>
+) t
+
+ORDER BY t.weight_score DESC, t.start_at DESC
+LIMIT #{limit}
+
+</select>
+
 </mapper>
